@@ -1,0 +1,85 @@
+[
+	{"粉專1":
+		[
+			{status_id_1 : 
+				[
+				{"內容":content},
+				{"分享數量":shares}
+				{"反映數量":reactions}
+				{"愛心":loves}
+				{"驚訝":wows}
+				{"有趣":hahas}
+				{"難過":sads}
+				{"生氣":angrys} 
+				] 
+			}
+			{status_id_2 :
+				[
+				{"內容":content},
+				{"分享數量":shares}
+				{"反映數量":reactions}
+				{"愛心":loves}
+				{"驚訝":wows}
+				{"有趣":hahas}
+				{"難過":sads}
+				{"生氣":angrys} 
+				] 
+			}
+		]
+	}
+]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[
+	{"留言人1":
+		[
+			{status_id_1:
+				[
+					{"留言甚麼":comment_message},
+					{"在哪個人底下留言":parent_id}
+				]
+			},
+			{status_id_2:
+				[
+					{"留言甚麼":comment_message},
+					{"在哪個人底下留言":parent_id}
+				]
+			}
+		]
+	}
+
+	{"留言人2":
+		[
+			{status_id_1:
+				[
+					{"留言甚麼":comment_message},
+					{"在哪個人底下留言":parent_id}
+				]
+			},
+			{status_id_2:
+				[
+					{"留言甚麼":comment_message},
+					{"在哪個人底下留言":parent_id}
+				]
+			}
+		]
+	}
+]
