@@ -1,6 +1,6 @@
 ﻿
 NEW VERSION:
-{
+[
 	{"平果日報":
 		[
 			{"蔡秉宏": [comment_message1,comment_message2,comment_message3]},
@@ -8,7 +8,7 @@ NEW VERSION:
 			{"將姜姜姜": [comment_message1,comment_message2,comment_message3]},
 			{"英宏": [comment_message1,comment_message2,comment_message3]}
 		]
-	}
+	},
 
 	{"CNN":
 		[
@@ -18,7 +18,7 @@ NEW VERSION:
 			{"英宏": [comment_message1,comment_message2,comment_message3]}
 		]
 	}
-}
+]
 
 
 
