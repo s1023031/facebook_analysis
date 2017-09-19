@@ -1,3 +1,36 @@
+﻿
+NEW VERSION:
+{
+	{"平果日報":
+		[
+			{"蔡秉宏": [comment_message1,comment_message2,comment_message3]},
+			{"翁湘雲": [comment_message1,comment_message2,comment_message3]},
+			{"將姜姜姜": [comment_message1,comment_message2,comment_message3]},
+			{"英宏": [comment_message1,comment_message2,comment_message3]}
+		]
+	}
+
+	{"CNN":
+		[
+			{"蔡秉宏": [comment_message1,comment_message2,comment_message3]},
+			{"翁湘雲": [comment_message1,comment_message2,comment_message3]},
+			{"將姜姜姜": [comment_message1,comment_message2,comment_message3]},
+			{"英宏": [comment_message1,comment_message2,comment_message3]}
+		]
+	}
+}
+
+
+
+
+
+
+
+
+
+
+POST:
+
 [
 	{"粉專1":
 		[
@@ -29,25 +62,7 @@
 	}
 ]
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+COMMENT:
 [
 	{"留言人1":
 		[
