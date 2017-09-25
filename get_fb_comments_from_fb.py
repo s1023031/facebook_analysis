@@ -9,9 +9,9 @@ from pymongo import MongoClient
 client = MongoClient("140.120.13.242",27017)
 print(client)
 
-db= client["test"]
+db= client["fb_analysis_v2"]
 # col=db["fansPage_v4"]
-col=db["t1"]
+col=db["person_info"]
 
 try:
     from urllib.request import urlopen, Request
@@ -184,16 +184,34 @@ def scrapeFacebookPageFeedComments(page_id, access_token):
                     print(url)
                     # print(comments['data'])
                     for comment in comments['data']:
-                        print('NAME:\n',comment['from']['name'],"\nID:\n",comment['from']['id'])
+                        cmlist = []
+                        cursor = col.find({"id":comment['from']['id']})
+                        if cursor.count() > 0:
+                            for x in cursor:
+                                cmlist = x["comment_list"]
+                                if page_id in cmlist:
+                                    break
+                                else:
+                                    cmlist.append(page_id)
+                                    print(cmlist)
+                                    col.update({"id":comment['from']['id']}, {'$set': {"comment_list":cmlist}}, upsert=True)
+                        elif cursor.count() == 0:
+                            cmlist.append(page_id)
+                            col.insert({"id":comment['from']['id'],"name":comment['from']['name'],"comment_list":cmlist})
+
+                        #print('NAME:\n',comment['from']['name'],"\nID:\n",comment['from']['id'])
                         comment_data = processFacebookComment(comment, status['status_id'])
                         
                         reactions_data = reactions[comment_data[0]]
                         # 留言的人 = comment_data[4]
                         # 留言的人說了甚麼話 = comment_data[3]
+                        # col2 = db["co"+page_id]
+                        # col2.insert({"id":comment['from']['id'],"comment_id":comment_data[0],"comment":comment_data[3],"status_id":comment_data[1]})
+                        print(comment['from']['id'])
                         user_name=comment_data[4]
                         user_comments=comment_data[3]
                         # 找有無此留言人，並存入資料庫
-                        col.insert({'name':user_name,'fansPage':dic[page_id],'comment':user_comments})
+                        #col.insert({'name':user_name,'fansPage':dic[page_id],'comment':user_comments})
 
                         # calculate thankful/pride through algebra
                         num_special = comment_data[6] - sum(reactions_data)
