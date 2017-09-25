@@ -7,9 +7,9 @@ try:
 except ImportError:
     from urllib2 import urlopen, Request
 
-app_id = "332563757171300"
-app_secret = "0ce1fe89ba0238b8fa2b34b1dac89716"  # DO NOT SHARE WITH ANYONE!
-page_id = "2017CSIEBACCARAT"
+app_id = "1764350177196516"
+app_secret = "6de3392d9c717bb93d3d0a1bb3619b5a"  # DO NOT SHARE WITH ANYONE!
+page_id = "T3388"
 
 # input date formatted as YYYY-MM-DD
 since_date = ""
@@ -107,7 +107,7 @@ def processFacebookPageFeedStatus(status):
     status_published = datetime.datetime.strptime(
         status['created_time'], '%Y-%m-%dT%H:%M:%S+0000')
     status_published = status_published + \
-        datetime.timedelta(hours=-5)  # EST
+        datetime.timedelta(hours=8)  # TW_timeZone 
     status_published = status_published.strftime(
         '%Y-%m-%d %H:%M:%S')  # best time format for spreadsheet programs
 
@@ -125,7 +125,6 @@ def processFacebookPageFeedStatus(status):
 
 def scrapeFacebookPageFeedStatus(page_id, access_token, since_date, until_date):
     with open('{}_facebook_statuses.csv'.format(page_id), 'w' ,encoding='utf-8-sig') as file:
-        print("ENTERING")
         w = csv.writer(file)
         w.writerow(["status_id", "status_message", "link_name", "status_type",
                     "status_link", "status_published", "num_reactions",
@@ -167,8 +166,6 @@ def scrapeFacebookPageFeedStatus(page_id, access_token, since_date, until_date):
 
                 num_processed += 1
                 if num_processed % 100 == 0:
-                    print(status['name'])
-
                     print("{} Statuses Processed: {}".format
                           (num_processed, datetime.datetime.now()))
 

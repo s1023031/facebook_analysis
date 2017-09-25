@@ -2,14 +2,32 @@ import json
 import datetime
 import csv
 import time
+
+import pymongo
+from pymongo import MongoClient
+
+client = MongoClient("140.120.13.242",27017)
+print(client)
+
+db= client["test"]
+# col=db["fansPage_v4"]
+col=db["t1"]
+
 try:
     from urllib.request import urlopen, Request
 except ImportError:
     from urllib2 import urlopen, Request
 
-app_id = "332563757171300"
-app_secret = "0ce1fe89ba0238b8fa2b34b1dac89716"  # DO NOT SHARE WITH ANYONE!
-file_id = "2017CSIEBACCARAT"
+app_id = "1764350177196516"
+app_secret = "6de3392d9c717bb93d3d0a1bb3619b5a"  # DO NOT SHARE WITH ANYONE!
+# file_id = ["tsaiingwen","MaYingjeou","starbuckstaiwan","duncanlindesign","jay","ashin555","YahooTWNews","ETtoday","news.ebc","appledaily.tw"]
+# file_name=["蔡英文","馬英九","統一星巴克咖啡同好會","Duncan","周杰倫_Jay_Chou","五月天_阿信","Yahoo_奇摩新聞","ETNEWS新聞雲","東森新聞","台灣蘋果日報"]
+file_id = ["2017CSIEBACCARAT"]
+file_name=["資百樂"]
+dic=dict()
+for i in range(1):
+    dic[file_id[i]]=file_name[i]
+
 
 access_token = app_id + "|" + app_secret
 
@@ -17,6 +35,7 @@ access_token = app_id + "|" + app_secret
 def request_until_succeed(url):
     req = Request(url)
     success = False
+    count=0
     while success is False:
         try:
             response = urlopen(req)
@@ -28,6 +47,11 @@ def request_until_succeed(url):
 
             print("Error for URL {}: {}".format(url, datetime.datetime.now()))
             print("Retrying.")
+            if count==3:
+                return None
+            else:
+                count+=1
+
 
     return response.read().decode('utf8')
 
@@ -118,7 +142,7 @@ def processFacebookComment(comment, status_id, parent_id=''):
 
 
 def scrapeFacebookPageFeedComments(page_id, access_token):
-    with open('{}_facebook_comments.csv'.format(file_id), 'w',encoding='utf-8-sig') as file:
+    with open('{}_facebook_comments.csv'.format(page_id), 'w',encoding='utf-8-sig') as file:
         w = csv.writer(file)
         w.writerow(["comment_id", "status_id", "parent_id", "comment_message",
                     "comment_author", "comment_published", "num_reactions",
@@ -133,9 +157,9 @@ def scrapeFacebookPageFeedComments(page_id, access_token):
             100, access_token)
 
         print("Scraping {} Comments From Posts: {}\n".format(
-            file_id, scrape_starttime))
+            dic[page_id], scrape_starttime))
 
-        with open('{}_facebook_statuses.csv'.format(file_id), 'r',encoding='utf-8-sig') as csvfile:
+        with open('{}_facebook_statuses.csv'.format(page_id), 'r',encoding='utf-8-sig') as csvfile:
             reader = csv.DictReader(csvfile)
 
             # Uncomment below line to scrape comments for a specific status_id
@@ -151,19 +175,29 @@ def scrapeFacebookPageFeedComments(page_id, access_token):
                     base_url = base + node + parameters + after
 
                     url = getFacebookCommentFeedUrl(base_url)
-                    # print(url)
-                    comments = json.loads(request_until_succeed(url))
-                    reactions = getReactionsForComments(base_url)
-
+                    try:
+                        comments = json.loads(request_until_succeed(url))
+                        reactions = getReactionsForComments(base_url)
+                    except:
+                        has_next_page=False
+                        print("server 無法回應")
+                    print(url)
+                    # print(comments['data'])
                     for comment in comments['data']:
-                        comment_data = processFacebookComment(
-                            comment, status['status_id'])
+                        print('NAME:\n',comment['from']['name'],"\nID:\n",comment['from']['id'])
+                        comment_data = processFacebookComment(comment, status['status_id'])
+                        
                         reactions_data = reactions[comment_data[0]]
+                        # 留言的人 = comment_data[4]
+                        # 留言的人說了甚麼話 = comment_data[3]
+                        user_name=comment_data[4]
+                        user_comments=comment_data[3]
+                        # 找有無此留言人，並存入資料庫
+                        col.insert({'name':user_name,'fansPage':dic[page_id],'comment':user_comments})
 
                         # calculate thankful/pride through algebra
                         num_special = comment_data[6] - sum(reactions_data)
-                        w.writerow(comment_data + reactions_data +
-                                   (num_special, ))
+                        w.writerow(comment_data + reactions_data +(num_special, ))
 
                         if 'comments' in comment:
                             has_next_subpage = True
@@ -171,39 +205,34 @@ def scrapeFacebookPageFeedComments(page_id, access_token):
 
                             while has_next_subpage:
                                 sub_node = "/{}/comments".format(comment['id'])
-                                sub_after = '' if sub_after is '' else "&after={}".format(
-                                    sub_after)
+                                sub_after = '' if sub_after is '' else "&after={}".format(sub_after)
                                 sub_base_url = base + sub_node + parameters + sub_after
 
-                                sub_url = getFacebookCommentFeedUrl(
-                                    sub_base_url)
-                                sub_comments = json.loads(
-                                    request_until_succeed(sub_url))
-                                sub_reactions = getReactionsForComments(
-                                    sub_base_url)
+                                sub_url = getFacebookCommentFeedUrl(sub_base_url)
+                                try:
+                                    sub_comments = json.loads(request_until_succeed(sub_url))
+                                    sub_reactions = getReactionsForComments(sub_base_url)
+                                except:
+                                    has_next_subpage = True
+                                    print("server 無法回應(sub)")
 
                                 for sub_comment in sub_comments['data']:
-                                    sub_comment_data = processFacebookComment(
-                                        sub_comment, status['status_id'], comment['id'])
-                                    sub_reactions_data = sub_reactions[
-                                        sub_comment_data[0]]
+                                    sub_comment_data = processFacebookComment(sub_comment, status['status_id'], comment['id'])
+                                    sub_reactions_data = sub_reactions[sub_comment_data[0]]
+                                    # 留言人底下的留言人 = sub_comment_data[4]
+                                    # 留言人底下的留言人之留言 = sub_comment_data[3]
 
-                                    num_sub_special = sub_comment_data[
-                                        6] - sum(sub_reactions_data)
+                                    num_sub_special = sub_comment_data[6] - sum(sub_reactions_data)
 
-                                    w.writerow(sub_comment_data +
-                                               sub_reactions_data + (num_sub_special,))
+                                    w.writerow(sub_comment_data +sub_reactions_data + (num_sub_special,))
 
                                     num_processed += 1
                                     if num_processed % 100 == 0:
-                                        print("{} Comments Processed: {}".format(
-                                            num_processed,
-                                            datetime.datetime.now()))
+                                        print("{} Comments Processed: {}".format(num_processed,datetime.datetime.now()))
 
                                 if 'paging' in sub_comments:
                                     if 'next' in sub_comments['paging']:
-                                        sub_after = sub_comments[
-                                            'paging']['cursors']['after']
+                                        sub_after = sub_comments['paging']['cursors']['after']
                                     else:
                                         has_next_subpage = False
                                 else:
@@ -213,9 +242,7 @@ def scrapeFacebookPageFeedComments(page_id, access_token):
                         # stalling
                         num_processed += 1
                         if num_processed % 100 == 0:
-                            print("{} Comments Processed: {}".format(
-                                num_processed, datetime.datetime.now()))
-
+                            print("{} Comments Processed: {}".format(num_processed, datetime.datetime.now()))
                     if 'paging' in comments:
                         if 'next' in comments['paging']:
                             after = comments['paging']['cursors']['after']
@@ -224,12 +251,12 @@ def scrapeFacebookPageFeedComments(page_id, access_token):
                     else:
                         has_next_page = False
 
-        print("\nDone!\n{} Comments Processed in {}".format(
-            num_processed, datetime.datetime.now() - scrape_starttime))
+        print("\nDone!\n{} Comments Processed in {}".format(num_processed, datetime.datetime.now() - scrape_starttime))
 
 
 if __name__ == '__main__':
-    scrapeFacebookPageFeedComments(file_id, access_token)
+    for file_name in file_id:
+        scrapeFacebookPageFeedComments(file_name, access_token)
 
 
 # The CSV can be opened in all major statistical programs. Have fun! :)
