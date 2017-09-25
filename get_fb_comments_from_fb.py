@@ -9,9 +9,11 @@ from pymongo import MongoClient
 client = MongoClient("140.120.13.242",27017)
 print(client)
 
-db= client["fb_analysis_v2"]
-# col=db["fansPage_v4"]
-col=db["person_info"]
+# db= client["fb_analysis_v2"]
+# col=db["person_info"]
+
+db= client["t"]
+col=db["table3"]
 
 try:
     from urllib.request import urlopen, Request
@@ -22,12 +24,16 @@ app_id = "1764350177196516"
 app_secret = "6de3392d9c717bb93d3d0a1bb3619b5a"  # DO NOT SHARE WITH ANYONE!
 # file_id = ["tsaiingwen","MaYingjeou","starbuckstaiwan","duncanlindesign","jay","ashin555","YahooTWNews","ETtoday","news.ebc","appledaily.tw"]
 # file_name=["蔡英文","馬英九","統一星巴克咖啡同好會","Duncan","周杰倫_Jay_Chou","五月天_阿信","Yahoo_奇摩新聞","ETNEWS新聞雲","東森新聞","台灣蘋果日報"]
+# col_names=["tsaiingwen","MaYingjeou","starbuckstaiwan","duncanlindesign","jay","ashin555","YahooTWNews","ETtoday","news_ebc","appledaily_tw"]
 file_id = ["2017CSIEBACCARAT"]
 file_name=["資百樂"]
-dic=dict()
-for i in range(1):
-    dic[file_id[i]]=file_name[i]
+col_names=["CSIE"]
 
+col_dict=dict() # collection名稱
+dic=dict() # 粉專名稱
+for i in range(len(file_id)):
+    dic[file_id[i]]=file_name[i]
+    col_dict[file_id[i]]=col_names[i]
 
 access_token = app_id + "|" + app_secret
 
@@ -181,7 +187,7 @@ def scrapeFacebookPageFeedComments(page_id, access_token):
                     except:
                         has_next_page=False
                         print("server 無法回應")
-                    print(url)
+                    # print(url)
                     # print(comments['data'])
                     for comment in comments['data']:
                         cmlist = []
@@ -192,11 +198,11 @@ def scrapeFacebookPageFeedComments(page_id, access_token):
                                 if page_id in cmlist:
                                     break
                                 else:
-                                    cmlist.append(page_id)
-                                    print(cmlist)
+                                    cmlist.append(col_dict[page_id])
+                                    # print(cmlist)
                                     col.update({"id":comment['from']['id']}, {'$set': {"comment_list":cmlist}}, upsert=True)
                         elif cursor.count() == 0:
-                            cmlist.append(page_id)
+                            cmlist.append(col_dict[page_id])
                             col.insert({"id":comment['from']['id'],"name":comment['from']['name'],"comment_list":cmlist})
 
                         #print('NAME:\n',comment['from']['name'],"\nID:\n",comment['from']['id'])
@@ -205,9 +211,9 @@ def scrapeFacebookPageFeedComments(page_id, access_token):
                         reactions_data = reactions[comment_data[0]]
                         # 留言的人 = comment_data[4]
                         # 留言的人說了甚麼話 = comment_data[3]
-                        # col2 = db["co"+page_id]
-                        # col2.insert({"id":comment['from']['id'],"comment_id":comment_data[0],"comment":comment_data[3],"status_id":comment_data[1]})
-                        print(comment['from']['id'])
+                        col2 = db[col_dict[page_id]]
+                        col2.insert({"id":comment['from']['id'],"comment_id":comment_data[0],"comment":comment_data[3],"status_id":comment_data[1]})
+                        # print(comment['from']['id'])
                         user_name=comment_data[4]
                         user_comments=comment_data[3]
                         # 找有無此留言人，並存入資料庫
