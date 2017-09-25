@@ -6,10 +6,19 @@ try:
     from urllib.request import urlopen, Request
 except ImportError:
     from urllib2 import urlopen, Request
+import pymongo
+from pymongo import MongoClient
+
+client = MongoClient("140.120.13.242",27017)
+print(client)
+
+db= client["fb_analysis_v2"]
+# col=db["fansPage_v4"]
+col=db["fp_content"]
 
 app_id = "1764350177196516"
 app_secret = "6de3392d9c717bb93d3d0a1bb3619b5a"  # DO NOT SHARE WITH ANYONE!
-page_id = "T3388"
+page_id = "2017CSIEBACCARAT"
 
 # input date formatted as YYYY-MM-DD
 since_date = ""
@@ -159,7 +168,10 @@ def scrapeFacebookPageFeedStatus(page_id, access_token, since_date, until_date):
                 if 'reactions' in status:
                     status_data = processFacebookPageFeedStatus(status)
                     reactions_data = reactions[status_data[0]]
-
+                    data_fp = {"status_id":status_data[0],"content":status_data[1]}
+                    print(status_data[0])
+                    print(status_data[1])
+                    col.insert(data_fp)
                     # calculate thankful/pride through algebra
                     num_special = status_data[6] - sum(reactions_data)
                     w.writerow(status_data + reactions_data + (num_special,))
