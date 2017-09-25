@@ -12,8 +12,8 @@ print(client)
 # db= client["fb_analysis_v2"]
 # col=db["person_info"]
 
-db= client["t"]
-col=db["table3"]
+db= client["fb_analysis"]
+col=db["person_info"]
 
 try:
     from urllib.request import urlopen, Request
@@ -25,9 +25,9 @@ app_secret = "6de3392d9c717bb93d3d0a1bb3619b5a"  # DO NOT SHARE WITH ANYONE!
 # file_id = ["tsaiingwen","MaYingjeou","starbuckstaiwan","duncanlindesign","jay","ashin555","YahooTWNews","ETtoday","news.ebc","appledaily.tw"]
 # file_name=["蔡英文","馬英九","統一星巴克咖啡同好會","Duncan","周杰倫_Jay_Chou","五月天_阿信","Yahoo_奇摩新聞","ETNEWS新聞雲","東森新聞","台灣蘋果日報"]
 # col_names=["tsaiingwen","MaYingjeou","starbuckstaiwan","duncanlindesign","jay","ashin555","YahooTWNews","ETtoday","news_ebc","appledaily_tw"]
-file_id = ["2017CSIEBACCARAT"]
-file_name=["資百樂"]
-col_names=["CSIE"]
+file_id = ["ashin555"]
+file_name=["五月天_阿信"]
+col_names=["ashin555"]
 
 col_dict=dict() # collection名稱
 dic=dict() # 粉專名稱
@@ -49,11 +49,11 @@ def request_until_succeed(url):
                 success = True
         except Exception as e:
             print(e)
-            time.sleep(5)
+            time.sleep(2)
 
             print("Error for URL {}: {}".format(url, datetime.datetime.now()))
             print("Retrying.")
-            if count==3:
+            if count==2:
                 return None
             else:
                 count+=1
@@ -191,16 +191,15 @@ def scrapeFacebookPageFeedComments(page_id, access_token):
                     # print(comments['data'])
                     for comment in comments['data']:
                         cmlist = []
-                        cursor = col.find({"id":comment['from']['id']})
+                        cursor = col.find({"id":comment['from']['id']}).limit(1)
                         if cursor.count() > 0:
                             for x in cursor:
                                 cmlist = x["comment_list"]
-                                if page_id in cmlist:
-                                    break
-                                else:
+                                if col_dict[page_id] not in cmlist:
                                     cmlist.append(col_dict[page_id])
                                     # print(cmlist)
                                     col.update({"id":comment['from']['id']}, {'$set': {"comment_list":cmlist}}, upsert=True)
+
                         elif cursor.count() == 0:
                             cmlist.append(col_dict[page_id])
                             col.insert({"id":comment['from']['id'],"name":comment['from']['name'],"comment_list":cmlist})
