@@ -12,7 +12,7 @@ print(client)
 # db= client["fb_analysis_v2"]
 # col=db["person_info"]
 
-db= client["fb_analysis"]
+db= client["fb_analysis_ver1"]
 col=db["person_info"]
 
 try:
@@ -25,9 +25,9 @@ app_secret = "6de3392d9c717bb93d3d0a1bb3619b5a"  # DO NOT SHARE WITH ANYONE!
 # file_id = ["tsaiingwen","MaYingjeou","starbuckstaiwan","duncanlindesign","jay","ashin555","YahooTWNews","ETtoday","news.ebc","appledaily.tw"]
 # file_name=["蔡英文","馬英九","統一星巴克咖啡同好會","Duncan","周杰倫_Jay_Chou","五月天_阿信","Yahoo_奇摩新聞","ETNEWS新聞雲","東森新聞","台灣蘋果日報"]
 # col_names=["tsaiingwen","MaYingjeou","starbuckstaiwan","duncanlindesign","jay","ashin555","YahooTWNews","ETtoday","news_ebc","appledaily_tw"]
-file_id = ["ashin555"]
-file_name=["五月天_阿信"]
-col_names=["ashin555"]
+file_id = ["YahooTWNews"]
+file_name=["Yahoo_奇摩新聞"]
+col_names=["YahooTWNews"]
 
 col_dict=dict() # collection名稱
 dic=dict() # 粉專名稱
