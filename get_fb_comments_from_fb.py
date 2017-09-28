@@ -25,9 +25,9 @@ app_secret = "6de3392d9c717bb93d3d0a1bb3619b5a"  # DO NOT SHARE WITH ANYONE!
 # file_id = ["tsaiingwen","MaYingjeou","starbuckstaiwan","duncanlindesign","jay","ashin555","YahooTWNews","ETtoday","news.ebc","appledaily.tw"]
 # file_name=["蔡英文","馬英九","統一星巴克咖啡同好會","Duncan","周杰倫_Jay_Chou","五月天_阿信","Yahoo_奇摩新聞","ETNEWS新聞雲","東森新聞","台灣蘋果日報"]
 # col_names=["tsaiingwen","MaYingjeou","starbuckstaiwan","duncanlindesign","jay","ashin555","YahooTWNews","ETtoday","news_ebc","appledaily_tw"]
-file_id = ["YahooTWNews"]
-file_name=["Yahoo_奇摩新聞"]
-col_names=["YahooTWNews"]
+file_id = ["ashin555"]
+file_name=["五月天_阿信"]
+col_names=["ashin555"]
 
 col_dict=dict() # collection名稱
 dic=dict() # 粉專名稱
@@ -212,9 +212,9 @@ def scrapeFacebookPageFeedComments(page_id, access_token):
                         # 留言的人說了甚麼話 = comment_data[3]
                         col2 = db[col_dict[page_id]]
                         cursor2 = col2.find({"comment_id":comment_data[0]}).limit(1)
-                        if cursor2 <= 0:
+                        if cursor2.count() <= 0:
                             col2.insert({"id":comment['from']['id'],"comment_id":comment_data[0],"comment":comment_data[3],"status_id":comment_data[1]})
-                        elif cursor2 > 0:
+                        elif cursor2.count() > 0:
                             continue
                         # print(comment['from']['id'])
                         user_name=comment_data[4]
