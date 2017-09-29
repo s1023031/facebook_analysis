@@ -21,6 +21,7 @@ print(client,'\n')
 #     dic[file_id[i]]=file_name[i]
 #     col_dict[file_id[i]]=col_names[i]
 
+<<<<<<< HEAD
 db= client["fb_analysis_ver1"]
 col=db["person_info"]
 

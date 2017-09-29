@@ -12,7 +12,7 @@ print(client)
 # db= client["fb_analysis_v2"]
 # col=db["person_info"]
 
-db= client["fb_analysis_ver1"]
+db= client["fb_analysis_ver2"]
 col=db["person_info"]
 
 try:
@@ -25,9 +25,9 @@ app_secret = "6de3392d9c717bb93d3d0a1bb3619b5a"  # DO NOT SHARE WITH ANYONE!
 # file_id = ["tsaiingwen","MaYingjeou","starbuckstaiwan","duncanlindesign","jay","ashin555","YahooTWNews","ETtoday","news.ebc","appledaily.tw"]
 # file_name=["蔡英文","馬英九","統一星巴克咖啡同好會","Duncan","周杰倫_Jay_Chou","五月天_阿信","Yahoo_奇摩新聞","ETNEWS新聞雲","東森新聞","台灣蘋果日報"]
 # col_names=["tsaiingwen","MaYingjeou","starbuckstaiwan","duncanlindesign","jay","ashin555","YahooTWNews","ETtoday","news_ebc","appledaily_tw"]
-file_id = ["YahooTWNews"]
-file_name=["Yahoo_奇摩新聞"]
-col_names=["YahooTWNews"]
+file_id = ["tsaiingwen"]
+file_name=["蔡英文"]
+col_names=["tsaiingwen"]
 
 col_dict=dict() # collection名稱
 dic=dict() # 粉專名稱
@@ -49,11 +49,11 @@ def request_until_succeed(url):
                 success = True
         except Exception as e:
             print(e)
-            time.sleep(2)
+            time.sleep(1)
 
             print("Error for URL {}: {}".format(url, datetime.datetime.now()))
             print("Retrying.")
-            if count==2:
+            if count==1:
                 return None
             else:
                 count+=1
@@ -211,7 +211,11 @@ def scrapeFacebookPageFeedComments(page_id, access_token):
                         # 留言的人 = comment_data[4]
                         # 留言的人說了甚麼話 = comment_data[3]
                         col2 = db[col_dict[page_id]]
-                        col2.insert({"id":comment['from']['id'],"comment_id":comment_data[0],"comment":comment_data[3],"status_id":comment_data[1]})
+                        cursor2 = col2.find({"comment_id":comment_data[0]}).limit(1)
+                        if cursor2.count() <= 0:
+                            col2.insert({"id":comment['from']['id'],"comment_id":comment_data[0],"comment":comment_data[3],"status_id":comment_data[1]})
+                        elif cursor2.count() > 0:
+                            continue
                         # print(comment['from']['id'])
                         user_name=comment_data[4]
                         user_comments=comment_data[3]
