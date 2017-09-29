@@ -7,7 +7,7 @@ import pymongo
 from pymongo import MongoClient
 
 client = MongoClient("140.120.13.242",27017)
-print(client)
+print(client,'\n')
 
 # db= client["fb_analysis_v2"]
 # col=db["fp_content"]
@@ -21,7 +21,7 @@ print(client)
 #     dic[file_id[i]]=file_name[i]
 #     col_dict[file_id[i]]=col_names[i]
 
-db= client["fb_analysis_v2"]
+db= client["fb_analysis_ver1"]
 col=db["person_info"]
 
 while(1):
@@ -36,10 +36,11 @@ while(1):
 		continue
 
 	dic=dict() # 所有的相同的name會存在這裡
+	print("") # 空一行
 	for arr in cursor:
-		print(arr["id"],"/",arr["name"])
+		print(arr["id"],"/",arr["name"], "/ URL = www.facebook.com/"+arr["id"])
 		dic[arr["id"]]=arr["name"]
-
+	print("") # 空一行
 	while(1):
 		user_id=input("請輸入id: ")
 		if user_id=='exit':
@@ -50,10 +51,13 @@ while(1):
 			continue
 		for arr in cursor:
 			comment_list=arr['comment_list']
+			print(dic[user_id],'曾在以下粉絲頁留言\n')
 			for cmd in comment_list:
 				print(cmd)
+			print('') # 空一行
 		while(1):
 			search_mode=input("要看哪個粉專呢?(all 可以看全部)")
+			print('') # 空一行
 			if search_mode=='exit':
 				break
 			elif search_mode=='all':
@@ -62,7 +66,7 @@ while(1):
 					cursor=com_col.find({"id":user_id})
 					if cursor.count() >0:
 						for content in cursor:
-							print(content,'\n')
+							print(content['comment'],'\n')
 			else:
 				if search_mode not in comment_list:
 					print("是不是打錯字了?\n")
